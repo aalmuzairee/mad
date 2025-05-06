@@ -1,0 +1,45 @@
+name: mad
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - cudatoolkit=11.8
+  - pytorch=2.0.1 
+  - torchvision=0.15.2
+  - glew=2.1.0 # Metaworld
+  - mkl==2024.0
+  - pip
+  - pip:
+    - absl-py==2.1.0
+    - dm-control==1.0.14
+    - mujoco==2.3.7
+    - numpy==1.24
+    - termcolor==2.4.0
+    - hydra-core==1.1.1
+    - hydra-submitit-launcher==1.2.0
+    - omegaconf==2.1.2
+    - xmltodict==0.13.0
+    - opencv-python==4.9.0.80
+    - tb-nightly==2.16.0a20240209
+    - pandas==2.2.0
+    - pillow==10.2.0
+    - moviepy==1.0.3
+    - imageio==2.33.1
+    - imageio-ffmpeg==0.4.9
+    - wandb==0.16.3
+    - kubernetes
+    - transforms3d
+################### Metaworld requirements ################################
+    - cython<3.0
+    - setuptools==66
+    - wheel==0.38.4
+    - patchelf==0.17.2.1
+    - mujoco-py
+    - einops
+    - git+https://github.com/Farama-Foundation/Metaworld.git@04be337a12305e393c0caf0cbf5ec7755c7c8feb
+    # - gym==0.21 # Needs to be installed after creating the env
+################### ManiSkill requirements #####################################
+    - mani_skill

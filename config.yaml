@@ -1,0 +1,78 @@
+defaults:
+  - _self_
+  - override hydra/launcher: submitit_local
+  - override hydra/job_logging: disabled
+
+# environment
+task: ??? 
+cameras: [first, third1, third2]
+eval_cameras: [[first],[third1],[third2],[first,third1,third2]]
+frame_stack: 3
+seed: 1
+img_size: 84 # Height x Width
+
+
+# ManiSkill3-specific options
+ms_action: pos # Maniskill action space [pos, pose] (pos is 4, pose is 7)
+ms_mode: rgb # [rgbd, rgb, depth]
+ms_preprocess_depth: True # Preproccess depth to be int8 between [0,255] else int16
+
+# train settings
+discount: 0.99 # 0.99 for metaworld, 0.8 for maniskill
+num_seed_steps: 2000 
+batch_size: 256 
+device: cuda
+num_train_steps: 500_000 
+
+# replay buffer
+replay_buffer_size: 500_000
+replay_buffer_num_workers: 4
+nstep: 1 
+
+# evaluate train env while training
+eval_every_steps: 25_000  
+num_eval_episodes: 20 
+
+# saving videos from evaluation while training
+save_video: false
+save_final_video_once: true 
+video_dir: 'logs/video'
+num_record_eval_episodes: 3 
+
+# snapshot and csv
+save_snapshot: false
+save_csv: true
+
+# wandb
+use_wandb: false
+wandb_project: ??? # TODO: Fill these
+wandb_entity: ??? # TODO: Fill these
+exp_name: default
+wandb_silent: false
+
+# agent
+agent: drq
+lr: 5e-4
+feature_dim: 50
+state_shape: ??? # to be specified later
+obs_shape: ??? # to be specified later
+action_shape: ??? # to be specified later
+critic_target_tau: 0.01
+update_every_steps: 2
+num_expl_steps: 2000 
+hidden_dim: 1024
+init_temperature: 0.1
+log_std_bounds: [-10,2]
+# sada 
+sada_alpha: 0.8
+
+# agent instantiation
+agent_target:
+  _target_: algos.${agent}.AGENT
+
+
+# hydra
+hydra:
+  run:
+    dir: .
+  output_subdir: null
