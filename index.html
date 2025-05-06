@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Merging and Disentangling Views in Visual Reinforcement Learning for Robotic Manipulation">
+  <meta name="keywords" content="SADA, Image Reinforcement Learning, Reinforcement Learning, Visual Reinforcement Learning, 
+                                 RL, Visual Image Augmentations, Multi View Reinforcement Learning, Robotic Manipulation, Robot Learning,
+                                 Multi View Robot Learning, Multi View Disentanglement, Multi View Merging, Merging and Disentangling Views, 
+                                 MAD, Single View Augmentation, DrQ, Data Regularized Q, Augmentations RL">
+
+  <title>Merging and Disentangling Views in Visual Reinforcement Learning for Robotic Manipulation</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <link rel="icon" href="./static/images/cam_icon.png">
+  
+  <script src="./static/js/index.js"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+</head>
+<body>
+
+<div style="display: flex; flex-grow: 1; justify-content: center;">
+  <a class="navbar-item" href="https://aalmuzairee.github.io">
+    <span class="icon">
+        <i class="fas fa-home"></i>
+    </span>
+        &nbsp; 
+        Home
+  </a>
+</div>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">Merging and Disentangling Views<br>in Visual Reinforcement Learning<br>for Robotic Manipulation</h1>
+
+          <!-- <div class="is-size-5 publication-venue">
+            <a href="???">Under Review</a>
+          </div> -->
+          
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://aalmuzairee.github.io">Abdulaziz Almuzairee</a>,
+            </span>
+            <span class="author-block">
+              <a href="https://rohanpatil.me">Rohan Patil</a>,
+            </span>
+            <span class="author-block">
+              <a href="https://dwaitbhatt.com">Dwait Bhatt</a>,
+            </span>
+            <span class="author-block">
+              <a href="https://hichristensen.com">Henrik I. Christensen</a>
+            </span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">UC San Diego</span>
+          </div>
+
+
+
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="???"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="???"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv</span>
+                </a>
+              </span>
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/aalmuzairee/mad"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Head Figure -->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body" style="padding-bottom: 0px;">
+      <img width="100%" src="./static/images/head_diag.png">
+    </div>
+  </div>
+</section>
+
+<!-- Abstract -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Vision is well-known for its use in manipulation, especially using visual servoing. To make it robust, multiple cameras are needed to expand the
+            field of view. That is computationally challenging. Merging multiple views and using Q-learning allows the design of more effective representations
+            and optimization of sample efficiency. Such a solution might be expensive to deploy. To mitigate this, we introduce a <strong>Merge And Disentanglement
+            (MAD)</strong> algorithm that efficiently <strong>merges views to increase sample efficiency while augmenting with single-view features to allow lightweight 
+            deployment and ensure robust policies</strong>. We demonstrate the efficiency and robustness of our approach using Meta-World and ManiSkill3.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Camera Views Section -->
+<section class="section hero is-light is-small">
+  <div class="container has-text-centered is-max-desktop" style="width: 100%;">
+    <h2 class="title is-3">Setup</h2>
+    
+    <div class="camera-views-container">
+      <!-- Meta-World Camera Views -->
+      <div class="environment-views">
+        <h2 class="environment-title">Meta-World</h2>
+        <div class="views-row">
+          <div class="view-item">
+            <h3 class="view-title">First Person</h3>
+            <div class="view-image-container">
+              <img src="./static/images/views/hammer_first.png" alt="Meta-World First Person View"/>
+            </div>
+          </div>
+          <div class="view-item">
+            <h3 class="view-title">Third Person A</h3>
+            <div class="view-image-container">
+              <img src="./static/images/views/hammer_third_a.png" alt="Meta-World Third Person A View"/>
+            </div>
+          </div>
+          <div class="view-item">
+            <h3 class="view-title">Third Person B</h3>
+            <div class="view-image-container">
+              <img src="./static/images/views/hammer_third_b.png" alt="Meta-World Third Person B View"/>
+            </div>
+          </div>                  
+        </div>
+      </div>
+      
+      <!-- ManiSkill3 Camera Views -->
+      <div class="environment-views">
+        <h2 class="environment-title">ManiSkill3</h2>
+        <div class="views-row">
+          <div class="view-item">
+            <h3 class="view-title">First Person</h3>
+            <div class="view-image-container">
+              <img src="./static/images/views/PokeCube_first.png" alt="ManiSkill3 First Person View"/>
+            </div>
+          </div>
+          <div class="view-item">
+            <h3 class="view-title">Third Person A</h3>
+            <div class="view-image-container">
+              <img src="./static/images/views/PokeCube_third_a.png" alt="ManiSkill3 Third Person A View"/>
+            </div>
+          </div>
+          <div class="view-item">
+            <h3 class="view-title">Third Person B</h3>
+            <div class="view-image-container">
+              <img src="./static/images/views/PokeCube_third_b.png" alt="ManiSkill3 Third Person B View"/>
+            </div>
+          </div>                  
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- Method -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column">
+        <h2 class="title is-3">Method</h2>
+        <div class="content has-text-justified">
+          Building on prior work in multi-view reinforcement learning, we found it to pursue two distinct directions: 
+          one focused on merging camera views to improve sample efficiency, while the other focusing on disentangling camera views 
+          to create policies that are robust to camera view reduction. To unify these complementary approaches in pursuit 
+          of both increased sample efficiency and policy robustness, we propose <strong>MAD</strong>: <strong>M</strong>erge <strong>A</strong>nd <strong>D</strong>isentangle views for 
+          visual reinforcement learning. 
+          <br><br>
+          1) To <em><strong>merge</strong></em> views:  
+
+          Given a multi-view input \(\mathbf{o}^{m}_t = {\mathbf{o}^1_t, \mathbf{o}^2_t, ..., \mathbf{o}^n_t}\) consisting of \(n\) uncalibrated camera views at time \(t\), 
+          where each \(\mathbf{o}^i_t\) represents a single view \(\mathbf{o}^s_t\), each view is passed separately through a single shared CNN encoder \(f_\xi\). 
+          The output features of a single view input is then defined to be \(\mathcal{V}^i_t=f_\xi(\mathbf{o}^i_t)\). 
+          After encoding all singular views \({\mathcal{V}^1_t, \mathcal{V}^2_t, ..., \mathcal{V}^n_t}\), the features are merged through 
+          summation such that the combined multi-view representation becomes: \(\mathcal{M}_t = \sum_i^n{\mathcal{V}^i_t}\). 
+          Standard multi-view algorithms would only pass this merged feature representation \(\mathcal{M}_t\) to the downstream actor and critic. This causes the policy to fail
+          when some of the input camera views are missing. To avoid this, the camera view features need to be properly disentangled during training.
+
+
+          <br><br>
+          2) To <em><strong>disentangle</strong></em> views:  
+
+          The downstream actor and critic need to be trained on <em>both</em> the merged feature representation \(\mathcal{M}_t\) and all its singular view feature representations \(\mathcal{V}^i_t\).
+          However, naively training on both the merged representation and all its singular view representations decreases sample efficiency and destabilizes learning, as they can be viewed as 
+          multiple different states by the downstream actor and critic networks. 
+          
+          Therefore, we build upon <a href="https://aalmuzairee.github.io/SADA/"><strong>SADA</strong></a>, a framework for applying data augmentation to visual RL agents 
+          that stabilizes both the actor and the critic under data augmentation by selectively augmenting their inputs. We modify the RL loss 
+          objectives, such that we train on each merged feature representation, and apply all its singular view features as augmentations to it. 
+          Given a critic network \(Q_\theta\) parametrized by \(\theta\), an actor network \(\pi_\phi\) parametrized by \(\phi\), and \(n\) input camera views:
+
+
+          <br><br>
+          <em>(a)</em>  The loss function for a generic critic becomes:
+
+          $$
+          \mathcal{L}^\textcolor{blue}{\textbf{UnAug}}_{Q_{\theta}}(\mathcal{D}) = \mathbb{E}_{(\mathbf{o}^m_{t},\mathbf{a}_{t}, r_{t}, \mathbf{o}^m_{t+1})\sim\mathcal{D}} \Big[ \big( 
+            Q_\theta(\textcolor{blue}{\mathcal{M}_t}, \mathbf{a}_{t}) \;- r_t - \gamma Q_{\overline{\theta}}(\textcolor{blue}{\mathcal{M}_{t+1}}, \mathbf{a}') \big)^2 \Big] 
+          $$
+          $$
+            \mathcal{L}^\textcolor{blue}{\textbf{Aug}}_{Q_{\theta}}(\mathcal{D}, i) = \mathbb{E}_{(\mathbf{o}^m_{t},\mathbf{a}_{t}, r_{t}, \mathbf{o}^m_{t+1})\sim\mathcal{D}} \Big[ \big( 
+              Q_\theta(\textcolor{blue}{\mathcal{V}^{i}_t}, \mathbf{a}_{t}) \;- r_t - \gamma Q_{\overline{\theta}}(\textcolor{blue}{\mathcal{M}_{t+1}}, \mathbf{a}') \big)^2 \Big] 
+          $$
+          $$
+            \mathcal{L}_{Q_{\theta}}^\textbf{MAD}(\mathcal{D}) = \alpha *  \mathcal{L}_{Q_{\theta}}^\textcolor{blue}{\textbf{UnAug}}(\mathcal{D}) \; + \; (1-\alpha) *  \frac{1}{n}\sum_{i=1}^n\mathcal{L}_{Q_{\theta}}^\textcolor{blue}{\textbf{Aug}}(\mathcal{D, i})
+          $$          
+
+          where \(r_t\) is the reward at timestep \(t\) and \(\alpha\) is a hyperparameter that weighs the
+          unaugmented and augmented streams for more fine grained control over the learning.
+          <br><br>
+          <em>(b)</em> The loss function for a generic actor becomes: 
+          
+          $$
+          \mathcal{L}_{\pi_\phi}^\textcolor{blue}{\textbf{UnAug}}(\mathcal{D}) = \mathbb{E}_{\mathbf{o}^{m}_{t} \sim \mathcal{D}} \notag  \left[-Q_\theta(\textcolor{blue}{\mathcal{M}_t}, \pi_\phi(\textcolor{blue}{\mathcal{M}_t})) \right] 
+          $$
+          $$ 
+            \mathcal{L}_{\pi_\phi}^\textcolor{blue}{\textbf{Aug}}(\mathcal{D},i) = \mathbb{E}_{\mathbf{o}^{m}_{t} \sim \mathcal{D}} \notag  \left[-Q_\theta(\textcolor{blue}{\mathcal{M}_t}, \pi_\phi(\textcolor{blue}{\mathcal{V}^{i}_t})) \right] 
+          $$
+          $$
+            \mathcal{L}_{\pi_\phi}^\textbf{MAD}(\mathcal{D}) = \alpha *  \mathcal{L}_{\pi_\phi}^\textcolor{blue}{\textbf{UnAug}}(\mathcal{D}) \; + \; (1-\alpha) *  \frac{1}{n}\sum_{i=1}^n\mathcal{L}_{\pi_\phi}^\textcolor{blue}{\textbf{Aug}}(\mathcal{D},i)
+          $$
+
+          
+          By predicting the targets in both actor and critic updates 
+          from the merged feature representation only \(\mathcal{M}_t\), the variance in the targets is reduced, thereby stabilizing the RL learning objective under the application of data augmentation.
+          Simulatenously, the actor and critic are able to generalize to all singular views \(\mathcal{V}^i_t\) with minimal loss to training sample efficiency. 
+          A visual diagram of our method is illustrated below.
+
+        </div>
+        <div style="padding-top: 2%; padding-bottom: 2%;">
+          <img width="100%" src="./static/images/model_diag.png">
+          <div class="has-text-justified" style="padding-top: 3%;">
+            <strong>Method Diagram.</strong> Update diagram of a generic visual actor critic model with our modifications. Our method, MAD, <em>merges</em> camera views through feature summation and <em>disentangles</em> camera views by 
+            selectively augmenting inputs to the downstream actor and critic with all the singular view features. The agent is trained end-to-end with our defined MAD loss functions. 
+            <em>(Left)</em>: Single Shared CNN Encoder. <em>(Middle)</em>: Actor Update diagram  <em>(Right)</em>: Critic Update diagram.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<!-- Results Window -->
+<section class="section hero is-light is-small">
+  <div class="container has-text-centered is-max-desktop">
+    <h2 class="title is-3" >Videos</h2>
+    <div class="comparison-container">
+      <!-- Top-level tabs -->
+      <div class="tab-header" id="env-tabs">
+        <button class="tab active" onclick="switchEnv('MetaWorld')">Meta-World</button>
+        <button class="tab" onclick="switchEnv('ManiSkill3')">ManiSkill3</button>
+      </div>
+      
+      <!-- Task-level tabs (will be updated based on top-level tab) -->
+      <div class="tab-header" id="task-tabs">
+        <!-- Initially populated with Meta-World tasks -->
+        <button class="tab active" onclick="switchTask(0)">Disassemble</button>
+        <button class="tab" onclick="switchTask(1)">Hammer</button>
+        <button class="tab" onclick="switchTask(2)">Shelf Place</button>
+        <button class="tab" onclick="switchTask(3)">Stick Push</button>
+        <button class="tab" onclick="switchTask(4)">Hand Insert</button>
+      </div>
+      
+      <div class="tab-content" id="task-content">
+        <div class="comparison-grid">
+          <!-- Header row -->
+          <div class="header-row">
+            <div class="header-cell">Method</div>
+            <div class="header-cell">All Cameras</div>
+            <div class="header-cell">First Person</div>
+            <div class="header-cell">Third Person A</div>
+            <div class="header-cell">Third Person B</div>
+          </div>
+          
+          <!-- MAD (Ours) row -->
+          <div class="method-row">
+            <div class="method-name method-mad"><strong>MAD (Ours)</strong></div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/mad/disassemble_third+first+top_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/mad/disassemble_first_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/mad/disassemble_third_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/mad/disassemble_top_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+          </div>
+          
+          <!-- MVD row -->
+          <div class="method-row">
+            <div class="method-name method-mvd"><strong>MVD</strong></div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/mvd/disassemble_third+first+top_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/mvd/disassemble_first_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/mvd/disassemble_third_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/mvd/disassemble_top_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+          </div>
+          
+          <!-- VIB row -->
+          <div class="method-row">
+            <div class="method-name method-vib"><strong>VIB</strong></div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/vib/disassemble_third+first+top_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/vib/disassemble_first_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/vib/disassemble_third_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/vib/disassemble_top_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Single Camera row -->
+          <div class="method-row">
+            <div class="method-name method-single"><strong>Single Camera</strong></div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/single/disassemble_third+first+top_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/single/disassemble_first_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/single/disassemble_third_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+            <div class="video-cell">
+              <div class="video-container">
+                <video src="./static/videos/mw/single/disassemble_top_500000_.mp4" autoplay muted loop playsinline></video>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <br>
+  </div>
+</section>
+
+
+
+<!-- Results -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column">
+        <h2 class="title is-3">Results</h2>
+        <div class="has-text-justified">
+          On 20 visual RL tasks, <em><strong>MAD achieves high sample efficiency and displays robustness to a reduction in camera views</strong></em> , outperforming baselines. 
+          <br><br>
+          <img src="./static/images/results.png">
+          <strong>MAD View Robustness.</strong> Success rate averaged over all <emph>(Top)</emph> 15 Meta-World and <emph>(Bottom)</emph> 5 ManiSkill3 visual RL
+          tasks. Methods are trained on all three camera views and evaluated on all and singular camera views with the final average
+          displayed on the far right. Mean and 95% CI over 5 random seeds. 
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- Extensions -->
+<section class="section hero is-light is-small">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column">
+        <h2 class="title is-3">Extensions</h2>
+        <div class="has-text-justified">
+        We find that <em><strong>MAD can be applied to different modalities </strong></em>(RGB, Depth), instead of different camera views. Surprsingly, training using MAD with RGB and Depth, attains higher
+        sample efficiency on the Depth-Only evaluation than the Depth baseline.
+        </div>
+        <div class="camera-views-container">
+          <div class="environment-views">
+            <img src="./static/images/modality.png" alt="MAD Modality Transfer"/>
+          </div>
+        </div>
+        <div class="has-text-justified">
+          <br>
+          <strong>MAD Modality Extension.</strong> Success rate averaged over 5 ManiSkill3 tasks. <emph>(Left)</emph> RGB and Depth images from the PokeCube Third Person A view.
+          <emph>(Right)</emph> Methods are trained on one camera view (Third Person A) but with different modalities (RGB, Depth), and evaluated accordingly. 
+          Mean and 95% CI over 5 random seeds. 
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="section" id="Citation">
+  <div class="container is-max-desktop content">
+    <h2 class="title has-text-centered">Citation</h2>
+    <pre><code>@misc{almuzairee2025merging,
+      ???
+}</code></pre>
+  </div>
+</section>
+
+
+
+<footer class="footer">
+  <div class="container is-centered has-text-centered">
+    <div class="back-to-top-container">
+      <button id="back-to-top" class="back-to-top-btn">Back to Top</button>
+    </div>    
+  </div>
+  <br>
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8 has-text-centered">
+        <div class="content">
+          <p>
+            Website template based off <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> website.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

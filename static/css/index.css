@@ -1,0 +1,298 @@
+/* ===== MAIN LAYOUT AND TYPOGRAPHY ===== */
+body {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+strong {
+  font-family: 'Lato Bold', sans-serif;
+}
+
+/* ===== PUBLICATION STYLING ===== */
+.publication-title, 
+.publication-authors,
+.teaser {
+  font-family: 'Google Sans', sans-serif;
+}
+
+.publication-venue {
+  font-weight: bold;
+}
+
+.publication-venue a {
+  color: hsl(0, 0%, 4%) !important;
+}
+
+.publication-authors a {
+  color: hsl(204, 86%, 53%) !important;
+}
+
+.publication-authors a:hover {
+  text-decoration: underline;
+}
+
+.author-block {
+  display: inline-block;
+}
+
+/* ===== TEASER SECTION ===== */
+.teaser .hero-body {
+  padding-top: 0;
+  padding-bottom: 3rem;
+}
+
+/* ===== TABS AND NAVIGATION ===== */
+.tab-header {
+  display: flex;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab {
+  padding: 10px 15px;
+  background-color: #f0f3fa;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  flex: 1;
+  text-align: center;
+  transition: background-color 0.3s;
+  font-size: 14px;
+  border-top-left-radius: 1em;
+  border-top-right-radius: 1em;
+}
+
+.tab:hover {
+  background-color: #ca1111;
+  color: white;
+}
+
+.tab.active {
+  background-color: #fff;
+  font-weight: 600;
+  border-bottom: 3px solid #3498db;
+}
+
+.tab.active:hover {
+  background-color: #fff;  
+  color: #333;            
+  border-bottom: 3px solid #3498db;  
+  box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);  
+}
+
+/* Environment tabs styling */
+#env-tabs .tab {
+  background-color: #d1e0ff;
+  font-weight: 600;
+}
+
+#env-tabs .tab.active {
+  background-color: #ffffff;
+  border-bottom: 3px solid #3498db;
+}
+
+#env-tabs .tab:not(.active):hover {
+  background-color: #ca1111;
+  color: white;
+}
+
+#env-tabs .tab.active:hover {
+  background-color: #ffffff;
+  color: #333;
+  border-bottom: 3px solid #3498db;
+}
+
+/* ===== TAB CONTENT ===== */
+.tab-content {
+  padding: 15px;
+  background-color: #fff;
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+/* ===== VIDEO DISPLAY GRID ===== */
+.comparison-container {
+  width: 100%;
+  margin: 0 auto;
+  background-color: #f5f5f5;
+  border-radius: 1em;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: 100px minmax(0, 2.9fr) minmax(0, 1.0fr) minmax(0, 1.0fr) minmax(0, 1.0fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.header-row {
+  display: contents;
+}
+
+.header-cell {
+  padding: 8px 5px;
+  font-weight: bold;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+
+.method-row {
+  display: contents;
+  --row-height: 140px;
+}
+
+.method-name {
+  padding: 10px 5px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Method colors */
+.method-mad, 
+.method-mvd, 
+.method-vib, 
+.method-single { 
+  color: #000000; 
+}
+
+/* Override for the "All Cameras" video in Single Camera method row */
+.method-row:nth-child(5) .video-cell:nth-child(2) .video-container {
+  background-color: #ffffff !important;
+}
+
+/* ===== VIDEO ELEMENTS ===== */
+.video-container {
+  width: 100%;
+  background-color: #000000;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.video-container video {
+  height: var(--row-height);
+  max-width: 100%;
+  padding: 0.25em;
+  width: 100%;
+  object-fit: cover;
+}
+
+.video-cell {
+  text-align: center;
+}
+
+/* ===== CAMERA VIEWS SECTION ===== */
+.camera-views-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 30px;
+  margin-top: 1.0rem;
+  max-width: 100%;
+  width: 100%;
+}
+
+.environment-views {
+  flex: 1;
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.0rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+}
+
+.environment-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 1.2rem;
+  color: #333;
+}
+
+.views-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  width: 100%;
+}
+
+.view-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+}
+
+.view-title {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  color: #555;
+}
+
+.view-image-container {
+  max-width: 256px;
+  height: 100%;
+  aspect-ratio: 1/1;
+  position: relative;
+  border-radius: 0px;
+  background-color: #f0f0f0;
+}
+
+.view-image-container img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 0px;
+}
+
+/* ===== TITLES AND HEADINGS ===== */
+.title.is-3 {
+  padding-top: 0.25rem; 
+  padding-bottom: 0.5rem; 
+}
+
+/* ===== FOOTER AND NAVIGATION ===== */
+.back-to-top-container {
+  text-align: center;
+  padding: 20px 0;
+  width: 100%;
+}
+
+.back-to-top-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.back-to-top-btn:hover {
+  background-color: #2980b9;
+}
+
+.link-block a {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+
