@@ -23,6 +23,7 @@
   <link rel="icon" href="./static/images/cam_icon.png">
   
   <script src="./static/js/index.js"></script>
+  <script src="./static/js/screensize.js"></script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script defer src="./static/js/fontawesome.all.min.js"></script>
@@ -273,7 +274,7 @@
           
           By predicting the targets in both actor and critic updates 
           from the merged feature representation only \(\mathcal{M}_t\), the variance in the targets is reduced, thereby stabilizing the RL learning objective under the application of data augmentation.
-          Simulatenously, the actor and critic are able to generalize to all singular views \(\mathcal{V}^i_t\) with minimal loss to training sample efficiency. 
+          Through this formulation, the actor and critic are able to generalize to all singular views \(\mathcal{V}^i_t\) with minimal loss to training sample efficiency. 
           A visual diagram of our method is illustrated below.
 
         </div>
