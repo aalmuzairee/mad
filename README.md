@@ -16,7 +16,7 @@ This is the official Pytorch implementation of
 
 ## TLDR;
 
-We offer a method called MAD. Using MAD, an RL agent can easily merge multiple camera views to gain higher sample efficiency while still being able to function with any singular camera view alone. MAD by achieves that by (1) encoding camera views individually, (2) merging the individual camera view features through summation to create a multi camera view representation, (3) framing all the singular view representations as augmentations to the multi camera view representation during the learning.
+We offer a method called MAD. Using MAD, an RL agent can easily merge multiple camera views to gain higher sample efficiency while still being able to function with any singular camera view alone. MAD achieves that by (1) encoding camera views individually, (2) merging the individual camera view features through summation to create a multi camera view representation, (3) framing all the singular view representations as augmentations to the multi camera view representation during the learning.
 
 -----
 
