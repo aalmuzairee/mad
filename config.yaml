@@ -63,8 +63,8 @@ num_expl_steps: 2000
 hidden_dim: 1024
 init_temperature: 0.1
 log_std_bounds: [-10,2]
-# sada 
-sada_alpha: 0.8
+# mad
+mad_alpha: 0.8
 
 # agent instantiation
 agent_target:

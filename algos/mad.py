@@ -136,8 +136,8 @@ class AGENT:
 
         # SADA params
         self.num_views = cfg.obs_shape[0]
-        self.sada_alpha = cfg.sada_alpha
-        self.sada_beta = (1 - self.sada_alpha) 
+        self.mad_alpha = cfg.mad_alpha
+        self.sada_beta = (1 - self.mad_alpha) 
         self.num_repetitions = self.num_views + 1 # for unaugmented multi view (utility)
 
 
@@ -191,7 +191,7 @@ class AGENT:
         combined_Qs = [torch.cat([c1, c2], dim=0) for c1, c2 in zip(chunked_Q1, chunked_Q2)]
         Q_reg = combined_Qs[0] # (B, 2*Q)
         Q_augs = torch.cat(combined_Qs[1:], dim=0) # (V*B, 2*Q)
-        critic_reg_loss = (F.mse_loss(Q_reg, target_Q) * 2) * self.sada_alpha
+        critic_reg_loss = (F.mse_loss(Q_reg, target_Q) * 2) * self.mad_alpha
         critic_aug_loss = (F.mse_loss(Q_augs, target_Q.repeat(self.num_views, 1)) * 2) * self.sada_beta
         critic_loss = critic_reg_loss + critic_aug_loss
 
@@ -237,7 +237,7 @@ class AGENT:
 
         actor_loss_reg = (self.alpha.detach() * reg_log_prob - reg_Q).mean()
         actor_loss_aug = (self.alpha.detach() * aug_log_prob - aug_Q).mean()
-        actor_loss = (actor_loss_reg * self.sada_alpha) + (actor_loss_aug * self.sada_beta)
+        actor_loss = (actor_loss_reg * self.mad_alpha) + (actor_loss_aug * self.sada_beta)
 
         # optimize the actor
         self.actor_opt.zero_grad(set_to_none=True)
@@ -247,7 +247,7 @@ class AGENT:
         # SADA Loss - Alpha
         alpha_loss_reg = (self.alpha * (-reg_log_prob - self.target_entropy).detach()).mean()
         alpha_loss_aug = (self.alpha * (-aug_log_prob - self.target_entropy).detach()).mean()
-        alpha_loss = (alpha_loss_reg * self.sada_alpha) + (alpha_loss_aug * self.sada_beta)
+        alpha_loss = (alpha_loss_reg * self.mad_alpha) + (alpha_loss_aug * self.sada_beta)
 
         # optimize temperature
         self.log_alpha_optimizer.zero_grad(set_to_none=True)
