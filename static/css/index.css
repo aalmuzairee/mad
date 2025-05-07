@@ -295,4 +295,13 @@ strong {
   margin-bottom: 5px;
 }
 
+/* ===== SCREEN SIZES ===== */
 
+@media screen and (min-width: 1024px) and (max-width: 1440px) {
+  /* Set initial zoom level to 80% */
+  html, body {
+    zoom: 0.8; /* For most browsers */
+    -ms-zoom: 0.8; /* For IE */
+    -webkit-zoom: 0.8; /* For Safari */
+  }
+}
