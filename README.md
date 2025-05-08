@@ -4,13 +4,13 @@
 
 This is the official Pytorch implementation of
 
-[Merging and Disentangling Views for Visual Reinforcement Learning in Robotic Manipulation](???) by
+[Merging and Disentangling Views for Visual Reinforcement Learning in Robotic Manipulation](https://arxiv.org/abs/2505.04619) by
 
 [Abdulaziz Almuzairee](https://aalmuzairee.github.io), [Rohan Patil](https://rohanpatil.me/), [Dwait Bhatt](https://dwaitbhatt.com/), [Henrik I. Christensen](https://hichristensen.com) (UC San Diego)</br>
 
 </br><img width="100%" src="https://github.com/aalmuzairee/mad/blob/gh-pages/static/videos/repo_header.gif"></br>
 
-[[Website]](https://aalmuzairee.github.io/mad) [[Paper]](???) 
+[[Website]](https://aalmuzairee.github.io/mad) [[Paper]](https://arxiv.org/abs/2505.04619) 
 
 -----
 
@@ -25,7 +25,15 @@ We offer a method called MAD. Using MAD, an RL agent can easily merge multiple c
 If you find our work useful, please consider citing our paper:
 
 ```
-???
+@misc{almuzairee2025merging,
+      title={Merging and Disentangling Views in Visual Reinforcement Learning for Robotic Manipulation}, 
+      author={Abdulaziz Almuzairee and Rohan Patil and Dwait Bhatt and Henrik I. Christensen},
+      year={2025},
+      eprint={2505.04619},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2505.04619}, 
+}
 ```
 
 -----
