@@ -45,7 +45,7 @@ If you find our work useful, please consider citing our paper:
 We assume you have conda setup and have access to a GPU with CUDA >=11.0. 
 If building from docker, we recommend `nvidia/cudagl:11.3.0-base-ubuntu18.04` as the base image. 
 Our setup was tested on an NVIDIA-GeForce-RTX-3090 with 95GB CPU RAM (replay buffer implementation is not optimized).
-You can also run it with 35GB CPU RAM if you set frame_stack=1, but the results might underperform.
+You can also run it with 35GB CPU RAM if you set `frame_stack=1`, but the results might underperform.
 
 If you're ready, clone this repo:
 ```
