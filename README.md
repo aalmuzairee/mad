@@ -2,7 +2,7 @@
 
 <h1>Merging and Disentangling Views for Visual Reinforcement Learning in Robotic Manipulation</span></h1>
 
-This is the official Pytorch implementation of
+Pytorch implementation of
 
 [Merging and Disentangling Views for Visual Reinforcement Learning in Robotic Manipulation](https://arxiv.org/abs/2505.04619) by
 
