@@ -70,7 +70,7 @@ conda activate mad
 ```
 Finally you need to install gym=0.21 for Meta-World and setup the GPU links:
 ```
-ln -s /usr/local/cuda /usr/local/nvidia # maybe not needed
+ln -s /usr/local/cuda /usr/local/nvidia 
 pip install pip==24.0
 pip install gym==0.21
 ```
