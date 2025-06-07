@@ -201,7 +201,6 @@ class PixelWrapper(dm_env.Environment):
         self._env.unwrapped.model.cam_fovy[self._env.unwrapped.model.camera_name2id("behindGripper")] = 90
 
 
-
     def reset(self):
         time_step = self._env.reset()
         return time_step._replace(observation=self._get_pixel_obs())
@@ -237,7 +236,6 @@ class PixelWrapper(dm_env.Environment):
 
         cam_xmat = np.reshape(self._env.unwrapped.data.cam_xmat[self._env.unwrapped.model.camera_name2id("behindGripper")], (3,3))
         self._env.unwrapped.data.cam_xmat[self._env.unwrapped.model.camera_name2id("behindGripper")] = np.dot(cam_xmat, rotation_matrix).flatten() 
-
 
 
     # Utility, updating camera logic
@@ -345,8 +343,6 @@ class FrameStackWrapper(dm_env.Environment):
     def __getattr__(self, name):
         return getattr(self._env, name)
     
-
-
 
 
 

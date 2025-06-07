@@ -45,6 +45,7 @@ If you find our work useful, please consider citing our paper:
 We assume you have conda setup and have access to a GPU with CUDA >=11.0. 
 If building from docker, we recommend `nvidia/cudagl:11.3.0-base-ubuntu18.04` as the base image. 
 Our setup was tested on an NVIDIA-GeForce-RTX-3090 with 95GB CPU RAM (replay buffer implementation is not optimized).
+You can also run it with 35GB CPU RAM if you set frame_stack=1, but the results might underperform.
 
 If you're ready, clone this repo:
 ```
@@ -55,6 +56,8 @@ cd mad
 Then to run Meta-World you need to install mujoco210. We provide a utility script that installs it:
 
 ```
+apt update
+apt-get install gcc libosmesa6-dev wget git -y
 . ./extras/install_mw.sh
 ```
 
@@ -67,7 +70,7 @@ conda activate mad
 ```
 Finally you need to install gym=0.21 for Meta-World and setup the GPU links:
 ```
-ln -s /usr/local/cuda /usr/local/nvidia
+ln -s /usr/local/cuda /usr/local/nvidia # maybe not needed
 pip install pip==24.0
 pip install gym==0.21
 ```
@@ -82,10 +85,10 @@ We provide examples on how to train below.
 # Train MAD (Ours) with all three cameras and evaluate on all three singular and combined
 python train.py agent=mad task=basketball
 
-# Train Baseline (MVD) with two cameras, and evaluating on singular and combined cameras
+# Train MVD (Baseline) with two cameras, and evaluating on singular and combined cameras
 python train.py agent=baselines.mvd task=hammer cameras=[first,third1] eval_cameras=[[first],[third1],[first,third1]]
 
-# Train Baseline (VIB) with two cameras, and evaluating only on combined cameras
+# Train VIB (Baseline) with two cameras, and evaluating only on combined cameras
 python train.py agent=baselines.vib task=soccer cameras=[first,third1] eval_cameras=[[first,third1]]
 ```
  where the log outputs will be: 
@@ -176,7 +179,7 @@ We test on **20** Visual RL tasks from Meta-World and ManiSkill, which are:
 | `PullCube` |
 
 
-which can be set through the `task` variable.
+which can be set through the `task` variable. Note that you need to set `discount=0.8` for any ManiSkill3 task.
 
 -----
 

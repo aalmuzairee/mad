@@ -3,22 +3,20 @@
 from collections import deque
 from typing import Any, NamedTuple
 import numpy as np
+from PIL import Image
 
 import dm_env
 from dm_env import specs, TimeStep, StepType
 import logging
-logging.disable(level=logging.WARN) # Remove logging
+logging.disable(level=logging.WARN) 
 
 
-
-import envs.tasks_maniskill # Add tasks
+# Add tasks
+import envs.tasks_maniskill 
 import mani_skill.envs
 import gymnasium as gym
 
 from mani_skill.utils.wrappers.gymnasium import CPUGymWrapper
-
-from PIL import Image
-
 
 
 
@@ -29,21 +27,16 @@ def make(cfg):
     seed = cfg.seed
     cameras = cfg.cameras
     obs_mode = getattr(cfg, "ms_mode", "rgb") 
-    preprocess_depth = getattr(cfg, "ms_preprocess_depth", True)
     reward_scale = 1.0
     img_size = getattr(cfg, "img_size", 84)
     sensor_configs = {"width":img_size,"height":img_size}
-    if cfg.ms_action == "pose":
-        control_mode = "pd_ee_delta_pose"
-    else:
-        control_mode = "pd_ee_delta_pos"
     human_render_camera_configs = {"render_camera":{"width":512,"height":512}}
-    env_kwargs = dict(obs_mode=obs_mode, control_mode=control_mode, render_mode="all", sim_backend="cpu", reward_mode="normalized_dense", 
+
+    env_kwargs = dict(obs_mode=obs_mode, control_mode="pd_ee_delta_pos", render_mode="all", sim_backend="cpu", reward_mode="normalized_dense", 
                       sensor_configs=sensor_configs, human_render_camera_configs=human_render_camera_configs)
     env = gym.make(task, num_envs=1, **env_kwargs)
     env = CPUGymWrapper(env)
-    env = DMWrapper(env, seed, cameras=cameras, frame_stack=frame_stack, reward_scale=reward_scale, 
-                    preprocess_depth=preprocess_depth)
+    env = DMWrapper(env, seed, cameras=cameras, frame_stack=frame_stack, reward_scale=reward_scale)
     return env
 
 
@@ -53,11 +46,11 @@ def make(cfg):
 def rename_cams(new_cams):
     cam_list = []
     for c in new_cams:
-        if c == "first":
+        if c == "first": # first
             cam_list.append("hand_camera")
-        elif c == "third1": # third
+        elif c == "third1": # third A
             cam_list.append("side_camera")
-        elif c == "third2": # top
+        elif c == "third2": # third B
             cam_list.append("base_camera")
         else:
             cam_list.append(c)
@@ -66,10 +59,9 @@ def rename_cams(new_cams):
 
 class DMWrapper(dm_env.Environment):
     """
-        Convert environment to a DM environment, adds a state and success info, 
-        limits episode to max_episode_steps
+        Convert environment to a DM environment. Adds success, obs and rendering.
     """
-    def __init__(self, env, seed, cameras, frame_stack=1, reward_scale=1.0, preprocess_depth=False) -> None:
+    def __init__(self, env, seed, cameras, frame_stack=1, reward_scale=1.0) -> None:
         self._env = env
         self._reward_scale = reward_scale 
         # Success Metric
@@ -81,7 +73,6 @@ class DMWrapper(dm_env.Environment):
         obs, info = env.reset(seed=seed)
         self._camera_names = rename_cams(cameras)
 
-        self._preprocess_depth = preprocess_depth
         image_obs = self.extract_obs(obs)
         state_obs = self.extract_state(obs)
         self._observation_spec = specs.Array(
@@ -140,10 +131,7 @@ class DMWrapper(dm_env.Environment):
             if 'rgb' in d.keys():
                 view.append(d['rgb'])
             if 'depth' in d.keys():
-                if self._preprocess_depth:
-                    depth = self._scale_depth(d['depth'])
-                else:
-                    depth = d['depth']
+                depth = self._scale_depth(d['depth'])
                 view.append(depth)
             view = np.concatenate(view, axis=2) # H, W, C   
             if each_key == "hand_camera":
@@ -154,7 +142,7 @@ class DMWrapper(dm_env.Environment):
         return all_images
 
     # Extracts end effector state from full state
-    def extract_state(self, obs): #TODO add other states from extras
+    def extract_state(self, obs): 
         if 'is_grasped' in obs['extra'].keys():
             obs['extra']['is_grasped'] = np.array([int(obs['extra']['is_grasped'])], dtype=np.float32) # Converting is grasped to array
 
@@ -181,7 +169,8 @@ class DMWrapper(dm_env.Environment):
         state = self.extract_state(obs)
         obs = self.extract_obs(obs)
         self._is_success = int(info['success'])
-        if trun: # Ignore terminated signal since it ends with fewer rewards
+        # Ignore terminated signal since it ends with fewer rewards
+        if trun: 
             step_type = StepType.LAST
             discount = 0.0
         else:
@@ -212,46 +201,28 @@ class DMWrapper(dm_env.Environment):
                         )
 
     # Extended view
-    def render_multiview(self, img_size=256, visualize_like_obs=True):
+    def render_multiview(self, img_size=256):
         multiview_image = None
-        # Scales depth like how agent observes it
-        if visualize_like_obs:
-            # Extracting relevant sensors only 
-            full_obs = self._env.unwrapped.get_obs()['sensor_data']
-            sensor_images = []
-            for each_cam in self._camera_names:
-                curr_cam = full_obs[each_cam]
-                for each_key in curr_cam.keys():
-                    obs = curr_cam[each_key].cpu().numpy()[0]
-                    if each_key == "depth":
-                        obs = self._scale_depth(obs) if self._preprocess_depth else obs
-                        obs = np.concatenate([obs,obs,obs], axis=-1) # Repeat depth for visualization
-                    if each_cam == "hand_camera": #rotate for visualization
-                        obs = np.rot90(obs)
-                    sensor_images.append(obs)
-            sensor_images = np.concatenate(sensor_images, axis=1) # H, W, C
-            sensor_images = Image.fromarray(sensor_images)
-            scale = int(sensor_images.width / sensor_images.height)  # Number of views and sensors
-            sensor_images = np.array(sensor_images.resize((scale*img_size, img_size))) # H, W, C
-            # Render and add nice view
-            nice_image = self.render(img_size=img_size)
-            multiview_image = np.concatenate([sensor_images, nice_image], axis=1)
-        # Scales depth in default maniskill way
-        else:
-            sensor_images = self._env.unwrapped.render_sensors().cpu().numpy()[0]
-            # Gives back all sensors in this order (base_camera(third2), side_camera(third1), hand_camera(first))
-            # Extracting relevant sensors only
-            image_ind_dict = {"third2": 0, "base_camera": 0, "third1": 1, "side_camera": 1, "first": 2, "hand_camera": 2}
-            image_ind = list(map(image_ind_dict.get, self._camera_names))
-            sensor_images = np.array_split(sensor_images, 3, axis=1)
-            sensor_images = np.concatenate([sensor_images[i] for i in image_ind], axis=1)
-            sensor_images = Image.fromarray(sensor_images)
-            # Resizing for output
-            scale = int(sensor_images.width / sensor_images.height)  # Number of views and sensors
-            sensor_images = np.array(sensor_images.resize((scale*img_size, img_size))) # H, W, C
-            # Render and add nice view
-            nice_image = self.render(img_size=img_size)
-            multiview_image = np.concatenate([sensor_images, nice_image], axis=1)
+        # Extracting relevant sensors only 
+        full_obs = self._env.unwrapped.get_obs()['sensor_data']
+        sensor_images = []
+        for each_cam in self._camera_names:
+            curr_cam = full_obs[each_cam]
+            for each_key in curr_cam.keys():
+                obs = curr_cam[each_key].cpu().numpy()[0]
+                if each_key == "depth":
+                    obs = self._scale_depth(obs)
+                    obs = np.concatenate([obs,obs,obs], axis=-1) # Repeat depth for visualization
+                if each_cam == "hand_camera": #rotate for visualization
+                    obs = np.rot90(obs)
+                sensor_images.append(obs)
+        sensor_images = np.concatenate(sensor_images, axis=1) # H, W, C
+        sensor_images = Image.fromarray(sensor_images)
+        scale = int(sensor_images.width / sensor_images.height)  # Number of views and sensors
+        sensor_images = np.array(sensor_images.resize((scale*img_size, img_size))) # H, W, C
+        # Render and add nice view
+        nice_image = self.render(img_size=img_size)
+        multiview_image = np.concatenate([sensor_images, nice_image], axis=1)
         return multiview_image
 
     # Singular view

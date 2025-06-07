@@ -9,5 +9,4 @@ snapshots/
 snapshot.pt
 buffer/
 logs/
-extras/install_mw_full.sh
 static/

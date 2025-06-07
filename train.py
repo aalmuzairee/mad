@@ -91,7 +91,7 @@ class Workspace:
 
 
     def eval(self):
-       # Number of successive episodes to record for video
+       # number of successive episodes to record for video
         num_episodes_to_record = min(self.cfg.num_eval_episodes, self.cfg.num_record_eval_episodes)
         metrics = {}
         for each_cam in self.eval_cameras:
@@ -99,7 +99,7 @@ class Workspace:
             step, episode, total_reward, total_success = 0, 0, 0, 0  
             for episode in tqdm(range(self.cfg.num_eval_episodes), leave=False):
                 time_step = self.eval_env.reset()
-                # Record multiple episode videos
+                # record multiple episode videos
                 if (episode == 0) or (episode >= num_episodes_to_record): 
                     self.logger.video_recorder.init(self.eval_env, enabled=(episode==0))
                 while not time_step.last():
@@ -114,7 +114,7 @@ class Workspace:
                     step += 1
                 
                 total_success += getattr(self.eval_env, 'is_success', 0)
-                # Record multiple episode videos
+                # record multiple episode videos
                 if ((episode + 1) == num_episodes_to_record):
                     self.logger.video_recorder.save(file_name=f'{self.cfg.task}_{"+".join(each_cam)}_{self.global_step}', wandb=self.logger._wandb)
             # final increment
@@ -139,7 +139,6 @@ class Workspace:
 
 
     def train(self):
-        # predicates
         train_until_step = utils.Until(self.cfg.num_train_steps)
         seed_until_step = utils.Until(self.cfg.num_seed_steps)
         eval_every_step = utils.Every(self.cfg.eval_every_steps)
@@ -167,7 +166,7 @@ class Workspace:
                 # reset env
                 time_step = self.train_env.reset()
                 self.replay_storage.add(time_step)
-                # save snapshot
+                # save model
                 if self.cfg.save_snapshot:
                     self.save_snapshot()
                 episode_step = 0
@@ -217,7 +216,7 @@ class Workspace:
         for k, v in payload.items():
             self.__dict__[k] = v
 
-    # Saving model snapshot to wandb, close wandb, delete buffer files, closes envs
+    # saving model snapshot to wandb, close wandb, delete buffer files, closes envs
     def finish(self):
         snapshot = self.work_dir / 'snapshot.pt'
         self.logger.finish(snapshot)

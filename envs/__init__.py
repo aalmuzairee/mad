@@ -1,4 +1,4 @@
-# Makes the environment, supports [mw, ms]
+# Makes the environment, supports MetaWorld-v2 (mw) and ManiSkill3 (ms)
 suites_to_try = []
 try:
     import envs.metaworld as mw # MetaWorld-v2

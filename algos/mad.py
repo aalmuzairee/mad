@@ -33,7 +33,7 @@ class Encoder(nn.Module):
         x = self.conv(obs)
         x = x.view(b, num_views, -1)
         x_multi_view = x.sum(dim=1)
-        # SADA
+        # MAD
         if single_view_aug == True:
             x_single_view = x.transpose(0, 1).reshape(num_views * b, -1)
             x_multi_view = torch.cat([x_multi_view, x_single_view], dim=0)
@@ -134,11 +134,11 @@ class AGENT:
         self.train()
         self.critic_target.train()
 
-        # SADA params
+        # MAD params
         self.num_views = cfg.obs_shape[0]
         self.mad_alpha = cfg.mad_alpha
-        self.sada_beta = (1 - self.mad_alpha) 
-        self.num_repetitions = self.num_views + 1 # for unaugmented multi view (utility)
+        self.mad_beta = (1 - self.mad_alpha) 
+        self.num_repetitions = self.num_views + 1 # repeat once for each singular view, and an extra one for all views combined
 
 
     def train(self, training=True):
@@ -177,7 +177,7 @@ class AGENT:
                                  target_Q2) - self.alpha.detach() * log_prob
             target_Q = reward + (discount * target_V)
 
-        # SADA Loss
+        # MAD Loss
         target_Q = torch.cat([target_Q, target_Q], dim=0)
         action = torch.cat([action] * self.num_repetitions, dim=0)
         state = torch.cat([state] * self.num_repetitions, dim=0)
@@ -185,14 +185,14 @@ class AGENT:
         # get current Q estimates
         Q1, Q2 = self.critic(state, obs, action)
 
-        # SADA Loss - Critic
+        # MAD Loss - Critic
         chunked_Q1 = Q1.chunk(self.num_repetitions, dim=0)
         chunked_Q2 = Q2.chunk(self.num_repetitions, dim=0)
         combined_Qs = [torch.cat([c1, c2], dim=0) for c1, c2 in zip(chunked_Q1, chunked_Q2)]
-        Q_reg = combined_Qs[0] # (B, 2*Q)
-        Q_augs = torch.cat(combined_Qs[1:], dim=0) # (V*B, 2*Q)
+        Q_reg = combined_Qs[0] # (batch_size, 2*Q)
+        Q_augs = torch.cat(combined_Qs[1:], dim=0) # (num_views*batch_size, 2*Q)
         critic_reg_loss = (F.mse_loss(Q_reg, target_Q) * 2) * self.mad_alpha
-        critic_aug_loss = (F.mse_loss(Q_augs, target_Q.repeat(self.num_views, 1)) * 2) * self.sada_beta
+        critic_aug_loss = (F.mse_loss(Q_augs, target_Q.repeat(self.num_views, 1)) * 2) * self.mad_beta
         critic_loss = critic_reg_loss + critic_aug_loss
 
         metrics['critic_target_q'] = target_Q.mean().item()
@@ -215,7 +215,7 @@ class AGENT:
     def update_actor(self, state, obs):
         metrics = dict()
 
-        # SADA Loss
+        # MAD Loss
         chunked_obs = obs.chunk(self.num_repetitions, dim=0)
         obs_combined = chunked_obs[0]
         critic_obs = torch.cat([obs_combined] * self.num_repetitions, dim=0)
@@ -227,7 +227,7 @@ class AGENT:
         Q1, Q2 = self.critic(state, critic_obs, action)
         Q = torch.min(Q1, Q2)
 
-        # SADA Loss - Actor
+        # MAD Loss - Actor
         chunked_log_prob = log_prob.chunk(self.num_repetitions, dim=0)
         chunked_Q = Q.chunk(self.num_repetitions, dim=0)
         reg_log_prob = chunked_log_prob[0]
@@ -237,17 +237,17 @@ class AGENT:
 
         actor_loss_reg = (self.alpha.detach() * reg_log_prob - reg_Q).mean()
         actor_loss_aug = (self.alpha.detach() * aug_log_prob - aug_Q).mean()
-        actor_loss = (actor_loss_reg * self.mad_alpha) + (actor_loss_aug * self.sada_beta)
+        actor_loss = (actor_loss_reg * self.mad_alpha) + (actor_loss_aug * self.mad_beta)
 
         # optimize the actor
         self.actor_opt.zero_grad(set_to_none=True)
         actor_loss.backward()
         self.actor_opt.step()
 
-        # SADA Loss - Alpha
+        # MAD Loss - Alpha
         alpha_loss_reg = (self.alpha * (-reg_log_prob - self.target_entropy).detach()).mean()
         alpha_loss_aug = (self.alpha * (-aug_log_prob - self.target_entropy).detach()).mean()
-        alpha_loss = (alpha_loss_reg * self.mad_alpha) + (alpha_loss_aug * self.sada_beta)
+        alpha_loss = (alpha_loss_reg * self.mad_alpha) + (alpha_loss_aug * self.mad_beta)
 
         # optimize temperature
         self.log_alpha_optimizer.zero_grad(set_to_none=True)

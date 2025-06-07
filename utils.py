@@ -28,7 +28,7 @@ def calc_memory_gb(data_specs, num_steps):
         arr = np.zeros(int((gb_needed) * 1024 * 1024 * 1024 / 4), dtype=np.float32)
         del arr
     except:
-        print("Not enough cpu memory for replay buffer, tried to allocate: ", gb_needed," GB")
+        print("Not enough cpu memory for replay buffer, tried to allocate: ", gb_needed," GB. Try reducing frame_stack in config to 1.")
         exit()
     return
 
@@ -211,11 +211,6 @@ def schedule(schdl, step):
                 return (1.0 - mix) * final1 + mix * final2
     raise NotImplementedError(schdl)
 
-
-
-
-#############################################################################3
-# DrQ utils
 
 
 class TanhTransform(pyd.transforms.Transform):
