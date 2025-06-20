@@ -1,10 +1,10 @@
 
 
-<h1>Merging and Disentangling Views in Visual Reinforcement Learning for Robotic Manipulation</span></h1>
+<h1> Merging and Disentangling Views in Visual Reinforcement Learning for Robotic Manipulation</span></h1>
 
 Pytorch implementation of
 
-[Merging and Disentangling Views for Visual Reinforcement Learning in Robotic Manipulation](https://arxiv.org/abs/2505.04619) by
+[Merging and Disentangling Views in Visual Reinforcement Learning for Robotic Manipulation](https://arxiv.org/abs/2505.04619) by
 
 [Abdulaziz Almuzairee](https://aalmuzairee.github.io), [Rohan Patil](https://rohanpatil.me/), [Dwait Bhatt](https://dwaitbhatt.com/), [Henrik I. Christensen](https://hichristensen.com) (UC San Diego)</br>
 
@@ -14,9 +14,12 @@ Pytorch implementation of
 
 -----
 
-## TLDR;
+## 🎥 TLDR;
 
-We offer a method called MAD. Using MAD, an RL agent can easily merge multiple camera views to gain higher sample efficiency while still being able to function with any singular camera view alone. MAD achieves that by (1) encoding camera views individually, (2) merging the individual camera view features through summation to create a multi camera view representation, (3) framing all the singular view representations as augmentations to the multi camera view representation during the learning.
+We offer a method called MAD. Using MAD, a reinforcement learning agent can easily merge multiple camera views to gain higher sample efficiency while still being able to function with any singular camera view alone. MAD achieves that by 
+1) encoding camera views individually,
+2) merging the individual camera view features through summation to create a multi camera view representation,
+3) framing all the singular view representations as augmentations to the multi camera view representation during the learning.
 
 -----
 
@@ -40,22 +43,26 @@ If you find our work useful, please consider citing our paper:
 
 ## Getting Started
 
-### Installation
+### ⚙️ Installation
 
-We assume you have conda setup and have access to a GPU with CUDA >=11.0. 
-If building from docker, we recommend `nvidia/cudagl:11.3.0-base-ubuntu18.04` as the base image. 
-Our setup was tested on an NVIDIA-GeForce-RTX-3090 with 95GB CPU RAM (replay buffer implementation is not optimized).
-You can also run it with 35GB CPU RAM if you set `frame_stack=1`, but the results might underperform.
+System requirements:
+
+- GPU: Minimum 11 GB RAM, supports CUDA 11.0 or later 
+- CPU RAM:  95 GB  (Meta-World tasks), 135GB (ManiSkill3 tasks) -- replay buffer implementation is not optimized
+- CPU Cores: 4 cores
+- Average Runtime:  4hrs (Meta-World tasks), 6hrs (ManiSkill3 tasks)
+- Recommended Base Docker Image: `nvidia/cudagl:11.3.0-base-ubuntu18.04`
+- Conda
 
 If you're ready, clone this repo:
-```
-git clone git@github.com:aalmuzairee/mad.git
+```sh
+git clone https://github.com/aalmuzairee/mad.git
 cd mad
 ```
 
 Then to run Meta-World you need to install mujoco210. We provide a utility script that installs it:
 
-```
+```sh
 apt update
 apt-get install gcc libosmesa6-dev wget git -y
 . ./extras/install_mw.sh
@@ -63,21 +70,23 @@ apt-get install gcc libosmesa6-dev wget git -y
 
 After installing mujoco, you can then install the packages by running:
 
-```
+```sh
 cd mad
 conda env create -f environment.yaml
 conda activate mad
 ```
 Finally you need to install gym=0.21 for Meta-World and setup the GPU links:
-```
-ln -s /usr/local/cuda /usr/local/nvidia 
+```sh
 pip install pip==24.0
 pip install gym==0.21
+
+# some setups need the following symlink command
+ln -s /usr/local/cuda /usr/local/nvidia 
 ```
 
 -----
 
-## Example usage
+## 📜 Example usage
 
 We provide examples on how to train below.
 
@@ -112,7 +121,7 @@ We further provide limited logging in local csv files.
 
 -----
 
-## Config options
+## 📖 Config options
 
 Please refer to `config.yaml` for a full list of options.
 
@@ -125,7 +134,11 @@ There are four algorithms that you can choose from:
 - `baselines.vib` : [VIB (Hsu et al., 2022)](https://github.com/moojink/cube-grasping)
 - `baselines.drq` : [DrQ (Kostrikov et al., 2020)](https://github.com/denisyarats/drq)
 
-by setting the `agent` variable in the `cfgs/config.yaml` file or a commandline argument like `agent=mad`.
+by setting the `agent` variable in the `config.yaml` file or a commandline argument like `agent=mad`.
+
+#### Tasks
+
+We test on **20** Visual RL tasks from Meta-World and ManiSkill, you can find them listed in [`envs/__init__.py`](https://github.com/aalmuzairee/mad/blob/master/envs/__init__.py)
 
 #### Cameras
 
@@ -143,53 +156,26 @@ and for evaluation you can use any combination, but it must be a list of lists. 
 
 `eval_cameras=[[first],[third1],[third2],[first,third1,third2]]`
 
-which can all be set in `cfgs/config.yaml` file or as a command line argument to `train.py`.
-
-#### Tasks
-
-We test on **20** Visual RL tasks from Meta-World and ManiSkill, which are: 
-
-##### Meta-World:
-| task |
-| --- |
-| `basketball` |
-| `hammer` |
-| `peg-insert-side` |
-| `soccer` |
-| `sweep-into` |
-| `assembly` |
-| `hand-insert` |
-| `pick-out-of-hole` |
-| `pick-place` |
-| `push` |
-| `shelf-place` |
-| `disassemble` |
-| `stick-pull` |
-| `stick-push` |
-| `pick-place-wall` |
-
-##### ManiSkill3:
-
-| task |
-| --- |
-| `PokeCube` |
-| `PlaceSphere` |
-| `PickCube` |
-| `PushCube` |
-| `PullCube` |
-
-
-which can be set through the `task` variable. Note that you need to set `discount=0.8` for any ManiSkill3 task.
+which can all be set in `config.yaml` file or as a command line argument to `train.py`.
 
 -----
 
-## Visualization
+## ✨ Visualization
 
 We further offer on-screen rendering visualization scripts that help you visualize the environments, they can be found in extras/ and can be run using:
+```sh
+ # visualize metaworld
+python extras/visualize_mw.py
+
+# visualize maniskill
+python extras/visualize_ms.py
 ```
-python extras/visualize_mw.py; # visualize metaworld
-python extras/visualize_ms.py; # visualize maniskill
-```
+
+## ❓ FAQ
+
+#### Q: Can I train with lower CPU RAM?
+
+**A:** If you set `frame_stack=1` in the config, you will be able to train with 35 GB (Meta-World tasks) or 45GB (ManiSkill3 tasks). We haven't verified the results, but we would expect a ~5-10% drop in final performance.
 
 ## License
 
