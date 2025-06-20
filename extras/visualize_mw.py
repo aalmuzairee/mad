@@ -13,7 +13,8 @@ import time
 import numpy as np
 import cv2
 import numpy as np
-import envs.metaworld as mw
+from dm_env import StepType
+
 import envs 
 
 
@@ -36,26 +37,22 @@ def make(env_name="door-open"):
     cfg.sparse_rewards = False
     cfg.cameras = ['first','third1', 'third2']
 
-    env = mw.make(cfg)
+    env = envs.make(cfg)
     return env
 
 
 
 # Loops over all metaworld envs and displays
 def loop():
-    import cv2
-    from dm_env import StepType
 
-    env_names = ['basketball','hammer','peg-insert-side','soccer','sweep-into',
-                 'assembly','hand-insert','pick-out-of-hole','pick-place','push',
-                 'shelf-place','disassemble','stick-pull','stick-push','pick-place-wall'] 
-    envs = []
+    env_names = envs.mw_tasks
+    created_envs = []
     for env_name in env_names:
         print("Instantiating: ", env_name)
-        envs.append(make(env_name))
+        created_envs.append(make(env_name))
 
-    for i in range(len(envs)):
-        env = envs[i]
+    for i in range(len(created_envs)):
+        env = created_envs[i]
         env.reset()
         count=  0
         

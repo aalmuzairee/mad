@@ -1,7 +1,7 @@
-# Makes the environment, supports MetaWorld-v2 (mw) and ManiSkill3 (ms)
+# Makes the environment, supports Meta-World (mw) and ManiSkill3 (ms)
 suites_to_try = []
 try:
-    import envs.metaworld as mw # MetaWorld-v2
+    import envs.metaworld as mw # Meta-World
     suites_to_try.append(mw)
 except:
     pass
@@ -25,3 +25,27 @@ def make(cfg):
 
     return env
 
+
+# Meta-World tasks
+mw_tasks = ['basketball',
+            'hammer',
+            'peg-insert-side',
+            'soccer',
+            'sweep-into',
+            'assembly',
+            'hand-insert',
+            'pick-out-of-hole',
+            'pick-place',
+            'push',
+            'shelf-place',
+            'disassemble',
+            'stick-pull',
+            'stick-push',
+            'pick-place-wall']
+
+# ManiSkill3 tasks
+ms_tasks = ['PokeCube', 
+            'PlaceSphere', 
+            'PickCube', 
+            'PushCube', 
+            'PullCube']

@@ -13,10 +13,9 @@ import numpy as np
 import cv2
 import os
 import numpy as np
+from dm_env import StepType
 
 import envs
-import envs.maniskill as ms
-
 
 
 def make(env_name="PickCube"):
@@ -36,26 +35,24 @@ def make(env_name="PickCube"):
     cfg.ms_preprocess_depth = True
     cfg.cameras = ['first','third1','third2']
 
-    env = ms.make(cfg)
+    env = envs.make(cfg)
     env.reset()
 
     return env
 
 
-
 # Loops over all maniskill envs and displays
 def loop():
-    import cv2
-    from dm_env import StepType
 
-    env_names = ["PokeCube", 'PlaceSphere', 'PickCube', 'PushCube', 'PullCube']
-    envs = []
+    # Pulling all ManiSkill3 tasks
+    env_names = envs.ms_tasks 
+    created_envs = []
     for env_name in env_names:
         print("Instantiating: ", env_name)
-        envs.append(make(env_name))
+        created_envs.append(make(env_name))
 
-    for i in range(len(envs)):
-        env = envs[i]
+    for i in range(len(created_envs)):
+        env = created_envs[i]
 
         step = env.reset()
         count=  0

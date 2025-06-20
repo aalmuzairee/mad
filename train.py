@@ -45,6 +45,12 @@ class Workspace:
         self.eval_env = envs.make(self.cfg)
         self.eval_cameras = cfg.eval_cameras
 
+        # set discount factor
+        if cfg.task in envs.mw_tasks:
+            cfg.discount = 0.99
+        elif cfg.task in envs.ms_tasks:
+            cfg.discount = 0.8
+
         # create replay buffer
         data_specs = (self.train_env.state_spec(),
                       self.train_env.observation_spec(),

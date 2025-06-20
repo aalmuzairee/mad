@@ -1,6 +1,3 @@
-apt update; 
-apt-get install gcc libosmesa6-dev wget git -y; 
-
 cd ~; mkdir .mujoco; cd .mujoco; 
 wget https://github.com/deepmind/mujoco/releases/download/2.1.0/mujoco210-linux-x86_64.tar.gz; 
 tar -xzf mujoco210-linux-x86_64.tar.gz; rm mujoco210-linux-x86_64.tar.gz; 
