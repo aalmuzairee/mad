@@ -7,6 +7,11 @@ strong {
   font-family: 'Lato Bold', sans-serif;
 }
 
+/* Rescaling window size to 90% for better fit */
+html{
+  zoom: 0.9
+}
+
 /* ===== PUBLICATION STYLING ===== */
 .publication-title, 
 .publication-authors,
@@ -297,12 +302,3 @@ strong {
 
 
 
-/* Rescaling to 90% to better fit */
-html {
-  transform: scale(0.9);
-  transform-origin: 50% 0;  
-  width: 111.11%;
-  height: 111.11%;
-  overflow-x: hidden;
-  margin-left: -5.555%; 
-}
