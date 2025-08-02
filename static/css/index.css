@@ -19,7 +19,12 @@ strong {
 }
 
 .publication-venue a {
-  color: hsl(0, 0%, 4%) !important;
+  color: hsl(0, 0%, 0%) !important;
+}
+
+.publication-venue a:hover {
+  color: hsl(0, 0%, 30%) !important;
+  text-decoration: underline;
 }
 
 .publication-authors a {
@@ -95,11 +100,6 @@ strong {
   color: white;
 }
 
-#env-tabs .tab.active:hover {
-  background-color: #ffffff;
-  color: #333;
-  border-bottom: 3px solid #3498db;
-}
 
 /* ===== TAB CONTENT ===== */
 .tab-content {
@@ -295,3 +295,14 @@ strong {
   margin-bottom: 5px;
 }
 
+
+
+/* Rescaling to 90% to better fit */
+html {
+  transform: scale(0.9);
+  transform-origin: 50% 0;  
+  width: 111.11%;
+  height: 111.11%;
+  overflow-x: hidden;
+  margin-left: -5.555%; 
+}

@@ -2,12 +2,12 @@ window.HELP_IMPROVE_VIDEOJS = false;
 
 // Define task lists for each environment
 const taskData = {
-  'MetaWorld': ['Disassemble', 'Hammer', 'Shelf Place', 'Stick Push', 'Hand Insert'],
+  'Meta-World': ['Disassemble', 'Hammer', 'Shelf Place', 'Stick Push', 'Hand Insert'],
   'ManiSkill3': ['PokeCube', 'PlaceSphere', 'PickCube', 'PushCube', 'PullCube']
 };
 
 // Keep track of the current environment and task
-let currentEnv = 'MetaWorld';  // Changed from 'ManiSkill3' to 'MetaWorld'
+let currentEnv = 'Meta-World';  // Changed from 'ManiSkill3' to 'Meta-World'
 let currentTaskIndex = 0;
 
 // Function to switch the environment (top-level tab)
@@ -83,8 +83,8 @@ function taskNameToFilename(envName, taskName) {
   if (envName === 'ManiSkill3') {
     // For ManiSkill3, use the exact same name
     return taskName;
-  } else if (envName === 'MetaWorld') {
-    // For MetaWorld, convert to lowercase and replace spaces with hyphens
+  } else if (envName === 'Meta-World') {
+    // For Meta-World, convert to lowercase and replace spaces with hyphens
     return taskName.toLowerCase().replace(/ /g, '-');
   }
   return taskName; // Default fallback
@@ -134,7 +134,7 @@ function updateVideoSources(oldEnv, oldTask, newEnv, newTask) {
 // Initialize the first environment and task when the page loads
 document.addEventListener('DOMContentLoaded', function() {
   // Set initial environment and task
-  currentEnv = 'MetaWorld';  // Changed from 'ManiSkill3' to 'MetaWorld'
+  currentEnv = 'Meta-World';  // Changed from 'ManiSkill3' to 'Meta-World'
   currentTaskIndex = 0;
   
   // Make sure the correct environment tab is active
