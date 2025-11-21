@@ -41,6 +41,12 @@ If you find our work useful, please consider citing our paper:
 
 -----
 
+## ❗ Updates
+
+- **[Nov/20/2025]** Added a seperate branch for Meta-world-v3 support and eased installation process.
+
+-----
+
 ## Getting Started
 
 ### ⚙️ Installation
