@@ -65,7 +65,8 @@ class Workspace:
         self._replay_iter = None
 
         # make sure we have enough memory to train
-        utils.calc_memory_gb(data_specs, num_steps=cfg.num_train_steps)
+        num_buffer_steps = min(cfg.replay_buffer_size, cfg.num_train_steps)
+        utils.calc_memory_gb(data_specs, num_steps=num_buffer_steps)
 
         # create agent
         self.agent = make_agent(self.train_env.state_spec(),

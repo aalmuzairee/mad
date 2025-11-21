@@ -66,59 +66,6 @@ def cfg_to_group(cfg, return_list=False):
     return lst if return_list else '-'.join(lst)
 
 
-def get_runs(wandb, entity, project, tasks=None, exp_names=None, tags=None, verbose=False, **kwargs):
-    api = wandb.Api(timeout=60)
-    if tasks:
-        kwargs['filters'] = {'$or': [{'config.task': task} for task in tasks]}
-    if exp_names:
-        kwargs['filters'] = {'$or': [{'config.exp_name': exp_name} for exp_name in exp_names]}
-    if tags:
-        kwargs['filters'] = {"tags": {"$in": [tag for tag in tags]}}
-    runs = api.runs(os.path.join(entity, project), **kwargs)
-    if verbose:
-        print(f'Found {len(runs)} runs')
-    return runs
-
-
-def filter_runs(runs, verbose=True, **kwargs):
-    for k, v in kwargs.items():
-        runs = [run for run in runs if (run.config.get(k) in v if isinstance(v, (list, tuple, dict, range)) else run.config.get(k) == v)]
-    if verbose:
-        print(f'Returning {len(runs)} runs after applying filter {kwargs}')
-    return runs
-
-
-def check_and_clean_previous_runs(wandb, entity, project, cfg, delete_failed_runs=True, verbose=True):
-    """ 
-        Checks wandb if the run has been previously run succesfully or is currently ongoing. 
-        Optionally deletes failed previous runs
-    """
-    filter_tags = [cfg.task, cfg.agent, f"seed={str(cfg.seed)}"]
-    possible_runs = get_runs(wandb, entity, project, exp_names=[cfg.exp_name], verbose=False)
-    possible_runs = filter_runs(possible_runs, task=cfg.task, agent=cfg.agent, seed=cfg.seed, verbose=False)
-    successful_runs = [r for r in possible_runs if r.state == "finished"]
-    ongoing_runs = [r for r in possible_runs if r.state == "running"]
-    failed_runs = [r for r in possible_runs if r.state in ["crashed", "failed", "killed"]]
-    if delete_failed_runs and len(failed_runs) > 0:
-        if verbose:
-            print(f"Found {len(failed_runs)} failed runs in wandb with tags: {cfg.task}, {cfg.agent}, {cfg.seed}")
-        for run in failed_runs:
-            run.delete()
-        if verbose:
-            print("Deleted failed runs.")
-    if len(successful_runs) > 0:
-        if verbose:
-            print(f"Already have {len(successful_runs)} runs successfully finished in wandb with tags: {cfg.task}, {cfg.agent}, {cfg.seed}")
-            print("Finishing run and exiting.")
-        exit()
-    elif len(ongoing_runs) > 0:
-        if verbose:
-            print(f"There is {len(ongoing_runs)} ongoing runs in wandb with tags: {cfg.task}, {cfg.agent}, {cfg.seed}")
-            print("Finishing run and exiting.")
-        exit()
-    else:
-        return
-
 
 class Logger:
     """Primary logging object. Logs either locally or using wandb."""
@@ -139,10 +86,6 @@ class Logger:
         else:
             os.environ["WANDB_SILENT"] = "true" if cfg.wandb_silent else "false"
             import wandb
-            # Checks for run in wandb, ends if the exact task was already finished or is still running. Also deletes previous failed runs.
-            check_and_clean_previous_runs(wandb, entity=self.entity, project=self.project, cfg=cfg, delete_failed_runs=True)
-
-            # If it isn't finished, initialize wandb and run
             wandb.init(
                 project=self.project,
                 entity=self.entity,
