@@ -6,7 +6,7 @@ import numpy as np
 
 import dm_env
 from dm_env import specs, TimeStep, StepType
-from metaworld.envs import ALL_V2_ENVIRONMENTS_GOAL_OBSERVABLE
+from metaworld import ALL_V3_ENVIRONMENTS_GOAL_OBSERVABLE
 
 
 def make(cfg):
@@ -21,12 +21,13 @@ def make(cfg):
     max_episode_steps = 200
     sparse_rewards = getattr(cfg, 'sparse_rewards', False)
 
-    task += "-v2-goal-observable"
+    task += "-v3-goal-observable"
 
-    if task not in ALL_V2_ENVIRONMENTS_GOAL_OBSERVABLE:
-        raise ValueError('Invalid MetaWorld-v2 task:', task)
+    if task not in ALL_V3_ENVIRONMENTS_GOAL_OBSERVABLE.keys():
+        raise ValueError('Invalid MetaWorld-v3 task:', task)
 
-    env = ALL_V2_ENVIRONMENTS_GOAL_OBSERVABLE[task](seed=seed)
+    env = ALL_V3_ENVIRONMENTS_GOAL_OBSERVABLE[task](seed=seed)
+    
     env._freeze_rand_vec = False
     env = Gym2DMC(env, max_episode_steps = max_episode_steps, sparse_rewards=sparse_rewards) 
     env = ActionWrapper(env, action_repeat=action_repeat, dtype=np.float32, minimum=-1.0, maximum=1.0)
@@ -80,7 +81,7 @@ class Gym2DMC(dm_env.Environment):
 
 
     def step(self, action):
-        obs, reward, done, info = self._env.step(action)
+        obs, reward, term, trun, info = self._env.step(action)
         if self._sparse_rewards:
             reward = info['success']
         self._state_obs = obs.astype(np.float32)
@@ -98,7 +99,7 @@ class Gym2DMC(dm_env.Environment):
                         observation=obs)
 
     def reset(self):
-        obs = self._env.reset()
+        obs, info = self._env.reset()
         obs = self._env.step(np.zeros_like(self._env.action_space.sample()))[0]
         self._state_obs = obs.astype(np.float32)
         self._is_success = 0  # Adding success metric
@@ -194,11 +195,14 @@ class PixelWrapper(dm_env.Environment):
         # Updating camera logic
         self.change_cams(self._cameras)
         # Third1 Person Corner camera
-        self._env.unwrapped.model.cam_pos[self._env.unwrapped.model.camera_name2id("corner2")] = [0.75, 0.075, 0.7]
+        self._env.unwrapped.model.camera("corner2").pos = [0.75, 0.075, 0.7]
         # Third2 (Top-dow)n view camera
-        self._env.unwrapped.model.cam_pos[self._env.unwrapped.model.camera_name2id("corner3")] = [0.72, 0.1, 1.2] 
+        self._env.unwrapped.model.camera("corner3").pos = [0.72, 0.1, 1.2] 
         # Front Behind Grippper Camera
-        self._env.unwrapped.model.cam_fovy[self._env.unwrapped.model.camera_name2id("behindGripper")] = 90
+        self._env.unwrapped.model.camera("behindGripper").fovy = 90
+
+        # Initialize mujoco renderer viewport
+        self._env.unwrapped.mujoco_renderer.render(render_mode="rgb_array")
 
 
     def reset(self):
@@ -222,20 +226,22 @@ class PixelWrapper(dm_env.Environment):
     # Track cams in Mujoco need to be updated at every step, while fixed cams can be updated only once
     def update_trackcam_pos(self):
         # shift camera pos
-        self._env.unwrapped.data.cam_xpos[self._env.unwrapped.model.camera_name2id("gripperPOV")] += [0.045, -0.025, -0.04]
-        # shift camera pos
-        self._env.unwrapped.data.cam_xpos[self._env.unwrapped.model.camera_name2id("behindGripper")] += [0.0, 0.2, 0.00]
-        # rotate camera 180
+        self._env.unwrapped.data.camera("behindGripper").xpos += [0.0, 0.2, 0.00]
+
+        # rotate cameras 180
         yaw = np.radians(180)
         rotation_matrix = np.array([[np.cos(yaw), -np.sin(yaw), 0],
                         [np.sin(yaw), np.cos(yaw), 0],
                         [0, 0, 1]])
 
-        cam_xmat = np.reshape(self._env.unwrapped.data.cam_xmat[self._env.unwrapped.model.camera_name2id("gripperPOV")], (3,3))
-        self._env.unwrapped.data.cam_xmat[self._env.unwrapped.model.camera_name2id("gripperPOV")] = np.dot(cam_xmat, rotation_matrix).flatten() 
+        cam_xmat = np.reshape(self._env.unwrapped.data.camera("corner").xmat, (3,3))
+        self._env.unwrapped.data.camera("corner").xmat = np.dot(cam_xmat, rotation_matrix).flatten() 
 
-        cam_xmat = np.reshape(self._env.unwrapped.data.cam_xmat[self._env.unwrapped.model.camera_name2id("behindGripper")], (3,3))
-        self._env.unwrapped.data.cam_xmat[self._env.unwrapped.model.camera_name2id("behindGripper")] = np.dot(cam_xmat, rotation_matrix).flatten() 
+        cam_xmat = np.reshape(self._env.unwrapped.data.camera("corner2").xmat, (3,3))
+        self._env.unwrapped.data.camera("corner2").xmat = np.dot(cam_xmat, rotation_matrix).flatten() 
+
+        cam_xmat = np.reshape(self._env.unwrapped.data.camera("corner3").xmat, (3,3))
+        self._env.unwrapped.data.camera("corner3").xmat = np.dot(cam_xmat, rotation_matrix).flatten() 
 
 
     # Utility, updating camera logic
@@ -264,7 +270,12 @@ class PixelWrapper(dm_env.Environment):
         return np.concatenate(all_cams, axis=1) # Extended view
 
     def render(self, width=256, height=256, camera_name='corner2'):
-        return self._env.unwrapped.render(offscreen=True, resolution=(int(width), int(height)), camera_name=camera_name).copy()
+        self._env.unwrapped.mujoco_renderer.viewer.make_context_current()
+        self._env.unwrapped.mujoco_renderer.viewer.viewport.width = width
+        self._env.unwrapped.mujoco_renderer.viewer.viewport.height = height
+        img = self._env.unwrapped.mujoco_renderer.viewer.render(render_mode="rgb_array", camera_id=(self._env.unwrapped.model.camera(camera_name).id))
+        flipped_img = img[:, ::-1]
+        return flipped_img.copy()
 
     def observation_spec(self):
         return self._observation_spec

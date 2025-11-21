@@ -56,38 +56,21 @@ System requirements:
 - GPU: Minimum 11 GB RAM, supports CUDA 11.0 or later 
 - CPU RAM:  95 GB  (Meta-World tasks), 135GB (ManiSkill3 tasks) -- replay buffer implementation is not optimized
 - CPU Cores: 4 cores
-- Average Runtime:  4hrs (Meta-World tasks), 6hrs (ManiSkill3 tasks)
-- Recommended Base Docker Image: `nvidia/cudagl:11.3.0-base-ubuntu18.04`
+- Average Runtime:  ~4hrs (Meta-World tasks), ~6hrs (ManiSkill3 tasks)
+- Recommended Base Docker Image: `nvidia/cudagl:11.3.1-devel-ubuntu20.04`
 - Conda
 
 If you're ready, clone this repo:
 ```sh
 git clone https://github.com/aalmuzairee/mad.git
-cd mad
 ```
 
-Then to run Meta-World you need to install mujoco210. We provide a utility script that installs it:
-
-```sh
-apt update
-apt-get install gcc libosmesa6-dev wget git -y
-. ./extras/install_mw.sh
-```
-
-After installing mujoco, you can then install the packages by running:
+then install the packages by running:
 
 ```sh
 cd mad
 conda env create -f environment.yaml
 conda activate mad
-```
-Finally you need to install gym=0.21 for Meta-World and setup the GPU links:
-```sh
-pip install pip==24.0
-pip install gym==0.21
-
-# some setups need the following symlink command
-ln -s /usr/local/cuda /usr/local/nvidia 
 ```
 
 -----
